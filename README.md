@@ -1,2 +1,2 @@
 # npm
-using nginx_proxy_manager to manage your url in order to hide ur server ip
+using nginx_proxy_manager to manage your url in order to hide ur server ip and follow your port to nginx reverse server

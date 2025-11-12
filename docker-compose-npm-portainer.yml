@@ -1,0 +1,71 @@
+services:
+  # MariaDB for Nginx Proxy Manager (optional; NPM can use SQLite too)
+  npm_db:
+    image: jc21/mariadb-aria:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: change
+      MYSQL_DATABASE: npm
+      MYSQL_USER: npm
+      MYSQL_PASSWORD: change
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - nginx_proxy
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    depends_on:
+      - npm_db
+    ports:
+      - "80:80"    # HTTP (public)
+      - "443:443"  # HTTPS (public)
+      - "81:81"    # NPM admin UI (careful with firewall)
+    environment:
+      # Use DB-based config so NPM persists users/certs reliably
+      DB_MYSQL_HOST: npm_db
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: npm
+      DB_MYSQL_PASSWORD: hallesaale
+      DB_MYSQL_NAME: npm
+      # optional: set initial admin credentials
+      INITIAL_ADMIN_EMAIL: admin@aka-tech-it.info    # change 
+      INITIAL_ADMIN_PASSWORD: pass        # change
+    volumes:
+      - ./data/npm/data:/data
+      - ./data/npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - nginx_proxy
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token <tunnel token id>
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+
+  portainer:
+    image: portainer/portainer-ce:lts
+    command: -H unix:///var/run/docker.sock --http-enabled
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    expose:
+      - "9000"   # HTTP (legacy) — we will proxy this via NPM
+      - "9443"   # HTTPS (Portainer's builtin TLS)
+    networks:
+      - nginx_proxy
+
+volumes:
+  portainer_data:
+
+networks:
+  nginx_proxy:
+    driver: bridge
+    name: nginx_proxy   # optional: will create a network named "nginx_proxy"

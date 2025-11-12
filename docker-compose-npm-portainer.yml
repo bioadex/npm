@@ -28,7 +28,7 @@ services:
       DB_MYSQL_HOST: npm_db
       DB_MYSQL_PORT: 3306
       DB_MYSQL_USER: npm
-      DB_MYSQL_PASSWORD: hallesaale
+      DB_MYSQL_PASSWORD: change
       DB_MYSQL_NAME: npm
       # optional: set initial admin credentials
       INITIAL_ADMIN_EMAIL: admin@aka-tech-it.info    # change 
@@ -69,3 +69,4 @@ networks:
   nginx_proxy:
     driver: bridge
     name: nginx_proxy   # optional: will create a network named "nginx_proxy"
+

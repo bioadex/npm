@@ -1,5 +1,5 @@
 # npm
-using nginx_proxy_manager to manage your url in order to hide ur server ip and follow your port to nginx reverse server
+using nginx_proxy_manager to manage your url in order to hide ur server ip and forward the port to nginx reverse server
 
 <img width="1459" height="906" alt="image" src="https://github.com/user-attachments/assets/8e0297a8-a509-4138-b9db-ea2507123b56" />
 
